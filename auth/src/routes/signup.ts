@@ -5,7 +5,7 @@ import { DatabaseConnectionError } from '../errors/database-connection-error';
 
 const router = Router();
 
-router.get(
+router.post(
   '/api/users/signup',
   [
     body('email').isEmail().withMessage('Email must be valid'),
