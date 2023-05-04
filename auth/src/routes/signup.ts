@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { RequestValidationError } from '../errors/request-validation-error';
+import { DatabaseConnectionError } from '../errors/database-connection-error';
 
 const router = Router();
 
@@ -20,8 +21,7 @@ router.get(
       throw new RequestValidationError(errors.array());
     }
 
-    console.log('creating user...');
-    throw new Error('Error connecting to database');
+    throw new DatabaseConnectionError();
 
     res.send({});
   }
