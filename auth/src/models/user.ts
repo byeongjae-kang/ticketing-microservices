@@ -27,7 +27,17 @@ const userSchema = new Schema<IUserDoc, IUserModel>(
       required: true
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v;
+      }
+    }
+  }
 );
 
 userSchema.pre('save', async function (done) {
