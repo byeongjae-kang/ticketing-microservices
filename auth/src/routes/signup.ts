@@ -39,7 +39,7 @@ router.post(
         id: user._id,
         email: user.email
       },
-      'private key'
+      process.env.JWT_KEY!
     );
 
     req.session = { jwt: userJwt };
