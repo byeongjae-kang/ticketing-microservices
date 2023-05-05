@@ -1,4 +1,5 @@
-import { Date, HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import { Date, HydratedDocument, Model, Schema, model } from 'mongoose';
+import { Password } from '../services/password';
 
 interface IUser {
   email: string;
@@ -28,6 +29,14 @@ const userSchema = new Schema<IUserDoc, IUserModel>(
   },
   { timestamps: true }
 );
+
+userSchema.pre('save', async function (done) {
+  if (this.isModified('password')) {
+    const hashed = await Password.toHash(this.get('password'));
+    this.set('password', hashed);
+  }
+  done();
+});
 
 userSchema.statics.build = (user: IUser) => new User(user);
 
