@@ -29,8 +29,6 @@ router.post(
       throw new BadRequestError('Invalid credential');
     }
 
-    console.log(user);
-
     const userJwt = jwt.sign(
       {
         id: user._id,
