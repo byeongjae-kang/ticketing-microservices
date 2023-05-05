@@ -2,7 +2,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import { SIGNUP_URL } from './signup.test';
 
-const SIGNIN_URL = '/api/users/signin';
+export const SIGNIN_URL = '/api/users/signin';
 
 describe('signin', () => {
   beforeEach(async () => {
