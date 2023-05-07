@@ -1,5 +1,5 @@
+import { currentUser } from '@bk0719/common';
 import { Router } from 'express';
-import { currentUser } from '../middlewares/current-user';
 
 const router = Router();
 
