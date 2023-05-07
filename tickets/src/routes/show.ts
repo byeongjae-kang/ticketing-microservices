@@ -1,23 +1,19 @@
-import { NotFoundError, requireAuth } from '@bk0719/common';
+import { NotFoundError } from '@bk0719/common';
 import { Request, Response, Router } from 'express';
 import { Ticket } from '../models/ticket';
 
 const router = Router();
 
-router.post(
-  '/api/tickets/:id',
-  requireAuth,
-  async (req: Request, res: Response) => {
-    const { id } = req.params;
+router.post('/api/tickets/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-    const ticket = await Ticket.findOne({ _id: id });
+  const ticket = await Ticket.findOne({ _id: id });
 
-    if (!ticket) {
-      throw new NotFoundError();
-    }
-
-    res.status(200).send(ticket);
+  if (!ticket) {
+    throw new NotFoundError();
   }
-);
+
+  res.status(200).send(ticket);
+});
 
 export { router as showTicketRouter };

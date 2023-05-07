@@ -1,13 +1,17 @@
-import { requireAuth, validateRequest } from '@bk0719/common';
+import {
+  requireAuth,
+  validateRequest,
+  NotAuthorizedError,
+  NotFoundError
+} from '@bk0719/common';
 import { Request, Response, Router } from 'express';
 import { body } from 'express-validator';
 import { Ticket } from '../models/ticket';
-import { Types } from 'mongoose';
 
 const router = Router();
 
-router.post(
-  '/api/tickets',
+router.put(
+  '/api/tickets/:id',
   requireAuth,
   [
     body('title').notEmpty().withMessage('Title must be provided'),
@@ -16,16 +20,22 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { title, price } = req.body;
-    const ticket = Ticket.build({
-      title,
-      price,
-      userId: new Types.ObjectId(req.currentUser!.id)
-    });
 
+    const ticket = await Ticket.findById(req.params.id);
+
+    if (!ticket) {
+      throw new NotFoundError();
+    }
+
+    if (ticket.userId.toString() !== req.currentUser?.id.toString()) {
+      throw new NotAuthorizedError();
+    }
+
+    ticket.set({ title: title, price: price });
     await ticket.save();
 
     res.status(201).send(ticket);
   }
 );
 
-export { router as createTicketRouter };
+export { router as updateTicketRouter };

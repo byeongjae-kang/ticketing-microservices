@@ -6,6 +6,7 @@ import { NotFoundError, currentUser, errorHandler } from '@bk0719/common';
 import { createTicketRouter } from './routes/new';
 import { showTicketRouter } from './routes/show';
 import { showTicketsRouter } from './routes/tickets';
+import { updateTicketRouter } from './routes/update';
 
 export const app = express();
 
@@ -22,6 +23,7 @@ app.use(currentUser);
 app.use(createTicketRouter);
 app.use(showTicketRouter);
 app.use(showTicketsRouter);
+app.use(updateTicketRouter);
 
 app.all('*', () => {
   throw new NotFoundError();
