@@ -2,21 +2,21 @@ import request from 'supertest';
 import { app } from '../../app';
 import { Ticket } from '../../models/ticket';
 
-export const POST_URL = '/api/tickets';
+export const URL = '/api/tickets';
 
 describe('new', () => {
   it('has a route handler listening to /api/tickets for post requests', async () => {
-    const response = await request(app).post(POST_URL).send({});
+    const response = await request(app).post(URL).send({});
 
     expect(response.status).not.toEqual(404);
   });
   it('can only be accessed if the user is signed in', async () => {
-    await request(app).post(POST_URL).send({}).expect(401);
+    await request(app).post(URL).send({}).expect(401);
   });
 
   it('returns a status other than 401 if the user is signed in ', async () => {
     const response = await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({});
 
@@ -24,7 +24,7 @@ describe('new', () => {
   });
   it('returns an error if an invalid title is provided', async () => {
     await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({
         title: '',
@@ -33,7 +33,7 @@ describe('new', () => {
       .expect(400);
 
     await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({
         price: 10
@@ -42,7 +42,7 @@ describe('new', () => {
   });
   it('returns an error if an invalid price is provided', async () => {
     await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({
         title: 'title',
@@ -51,7 +51,7 @@ describe('new', () => {
       .expect(400);
 
     await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({
         title: 'title'
@@ -62,8 +62,8 @@ describe('new', () => {
     let tickets = await Ticket.find({});
     expect(tickets.length).toEqual(0);
 
-    const response = await request(app)
-      .post(POST_URL)
+    await request(app)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({
         title: 'title',

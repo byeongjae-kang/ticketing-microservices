@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { app } from '../../app';
-import { POST_URL } from './new.test';
+import { URL } from './new.test';
 import { Types } from 'mongoose';
 
 describe('show', () => {
   it('returns a 404 if the ticket is not found', async () => {
     const randomId = new Types.ObjectId();
     await request(app)
-      .post(`${POST_URL}/${randomId}`)
+      .post(`${URL}/${randomId}`)
       .set('Cookie', global.signin())
       .send()
       .expect(404);
@@ -17,7 +17,7 @@ describe('show', () => {
     const price = 20;
 
     const createNewResponse = await request(app)
-      .post(POST_URL)
+      .post(URL)
       .set('Cookie', global.signin())
       .send({ title, price })
       .expect(201);
@@ -25,7 +25,7 @@ describe('show', () => {
     const id = createNewResponse.body.id;
 
     const response = await request(app)
-      .post(`${POST_URL}/${id}`)
+      .post(`${URL}/${id}`)
       .set('Cookie', global.signin())
       .send()
       .expect(200);
