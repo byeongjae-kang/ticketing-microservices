@@ -3,6 +3,8 @@ import { Request, Response, Router } from 'express';
 import { body } from 'express-validator';
 import { Ticket } from '../models/ticket';
 import { Types } from 'mongoose';
+import { TicketCreatedPublisher } from '../events/publisher/ticket-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = Router();
 
@@ -23,6 +25,12 @@ router.post(
     });
 
     await ticket.save();
+
+    await new TicketCreatedPublisher(natsWrapper.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price
+    });
 
     res.status(201).send(ticket);
   }
