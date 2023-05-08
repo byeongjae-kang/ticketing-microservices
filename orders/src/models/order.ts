@@ -1,4 +1,4 @@
-import { Date, HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import { HydratedDocument, Model, Schema, Types, model } from 'mongoose';
 import { OrderStatus } from '@bk0719/common';
 import { ITicketDoc } from './ticket';
 
@@ -6,7 +6,7 @@ const statuses = [
   OrderStatus.Created,
   OrderStatus.Cancelled,
   OrderStatus.AwaitingPayment,
-  OrderStatus.complete
+  OrderStatus.completed
 ] as const;
 
 type StatusType = (typeof statuses)[number];
@@ -49,7 +49,7 @@ const orderSchema = new Schema<IOrderDoc, IOrderModel>(
       default: OrderStatus.Created
     },
     expiresAt: {
-      type: Date
+      type: Schema.Types.Date
     }
   },
   {

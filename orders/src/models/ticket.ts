@@ -1,4 +1,6 @@
+import { OrderStatus } from '@bk0719/common';
 import { Date, HydratedDocument, Model, Schema, model } from 'mongoose';
+import { Order } from './order';
 
 interface ITicket {
   title: string;
@@ -11,6 +13,7 @@ export interface ITicketDoc extends Document {
   version: number;
   createdAt?: Date;
   updatedAt?: Date;
+  isReserved(): boolean;
 }
 
 interface ITicketModel extends Model<ITicketDoc> {
@@ -45,5 +48,19 @@ const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
 );
 
 ticketSchema.statics.build = (ticket: ITicket) => new Ticket(ticket);
+ticketSchema.methods.isReserved = async function () {
+  const existingOrder = await Order.findOne({
+    ticket: this as any,
+    status: {
+      $in: [
+        OrderStatus.Created,
+        OrderStatus.AwaitingPayment,
+        OrderStatus.completed
+      ]
+    }
+  });
+
+  return !!existingOrder;
+};
 
 export const Ticket = model<ITicketDoc, ITicketModel>('Ticket', ticketSchema);
