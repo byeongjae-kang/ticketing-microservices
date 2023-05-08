@@ -3,6 +3,10 @@ import 'express-async-errors';
 import cookieSession from 'cookie-session';
 
 import { NotFoundError, currentUser, errorHandler } from '@bk0719/common';
+import { showOrdersRouter } from './routes/orders';
+import { showOrderRouter } from './routes/show';
+import { createOrderRouter } from './routes/new';
+import { deleteOrderRouter } from './routes/delete';
 
 export const app = express();
 
@@ -17,7 +21,13 @@ app.use(
 
 app.use(currentUser);
 
-app.all('*', () => {
+app.use(createOrderRouter);
+app.use(showOrdersRouter);
+app.use(showOrderRouter);
+app.use(deleteOrderRouter);
+
+app.all('*', (req, res) => {
+  console.log(req.body);
   throw new NotFoundError();
 });
 app.use(errorHandler);
