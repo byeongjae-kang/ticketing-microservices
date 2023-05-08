@@ -2,6 +2,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import { URL } from './new.test';
 import { Types } from 'mongoose';
+import { natsWrapper } from '../../nats-wrapper';
 
 describe('update ticket', () => {
   it('returns 404 if the id provided does not exist', async () => {
@@ -87,5 +88,26 @@ describe('update ticket', () => {
 
     expect(updateResponse.body.title).toEqual(newTitle);
     expect(updateResponse.body.price).toEqual(newPrice);
+  });
+
+  it('publishes an event', async () => {
+    const cookie = global.signin();
+    const response = await request(app)
+      .post(URL)
+      .send({ title: 'title', price: 29 })
+      .set('Cookie', cookie)
+      .expect(201);
+
+    const id = response.body.id;
+    const newTitle = 'new title';
+    const newPrice = 1000;
+
+    await request(app)
+      .put(`${URL}/${id}`)
+      .set('Cookie', cookie)
+      .send({ title: newTitle, price: newPrice })
+      .expect(201);
+
+    expect(natsWrapper.client.publish).toHaveBeenCalled();
   });
 });
