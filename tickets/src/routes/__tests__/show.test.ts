@@ -7,7 +7,7 @@ describe('show', () => {
   it('returns a 404 if the ticket is not found', async () => {
     const randomId = new Types.ObjectId();
     await request(app)
-      .post(`${URL}/${randomId}`)
+      .get(`${URL}/${randomId}`)
       .set('Cookie', global.signin())
       .send()
       .expect(404);
@@ -25,7 +25,7 @@ describe('show', () => {
     const id = createNewResponse.body.id;
 
     const response = await request(app)
-      .post(`${URL}/${id}`)
+      .get(`${URL}/${id}`)
       .set('Cookie', global.signin())
       .send()
       .expect(200);

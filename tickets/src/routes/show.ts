@@ -4,7 +4,7 @@ import { Ticket } from '../models/ticket';
 
 const router = Router();
 
-router.post('/api/tickets/:id', async (req: Request, res: Response) => {
+router.get('/api/tickets/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
 
   const ticket = await Ticket.findOne({ _id: id });
