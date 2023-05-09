@@ -4,6 +4,7 @@ import { URL } from './new.test';
 import { Types } from 'mongoose';
 import { Ticket } from '../../models/ticket';
 import { OrderStatus } from '@bk0719/common';
+import { natsWrapper } from '../../nats-wrapper';
 
 describe('show', () => {
   it('returns a 404 if the ticket is not found', async () => {
@@ -92,22 +93,32 @@ describe('show', () => {
       .expect(401);
   });
 
-  it.todo('publishes an event');
+  it('publishes an event', async () => {
+    const ticket = Ticket.build({
+      title: 'concert',
+      price: 12,
+      version: 1
+    });
+    await ticket.save();
+    const user = global.signin();
 
-  // , async () => {
-  // const ticket = Ticket.build({
-  //   price: 10,
-  //   title: 'check if even is emitted',
-  //   version: 1
-  // });
-  // await ticket.save();
-  // await request(app)
-  //   .post(URL)
-  //   .set('Cookie', global.signin())
-  //   .send({
-  //     ticketId: ticket._id
-  //   })
-  //   .expect(201);
-  // expect(natsWrapper.client.publish).toHaveBeenCalled();
-  // });
+    const createResponse = await request(app)
+      .post(URL)
+      .set('Cookie', user)
+      .send({
+        ticketId: ticket.id
+      })
+      .expect(201);
+
+    const orderId = createResponse.body.id;
+
+    const patchResponse = await request(app)
+      .patch(`${URL}/${orderId}`)
+      .set('Cookie', user)
+      .send()
+      .expect(201);
+
+    expect(patchResponse.body.status).toEqual(OrderStatus.Cancelled);
+    expect(natsWrapper.client.publish).toHaveBeenCalled();
+  });
 });

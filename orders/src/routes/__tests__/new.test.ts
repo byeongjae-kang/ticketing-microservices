@@ -3,10 +3,31 @@ import { app } from '../../app';
 import { Ticket } from '../../models/ticket';
 import { Types } from 'mongoose';
 import { OrderStatus } from '@bk0719/common';
+import { natsWrapper } from '../../nats-wrapper';
 
 export const URL = '/api/orders';
 
 describe('new', () => {
+  it('reserves the ticket', async () => {
+    const ticket = Ticket.build({ price: 200, title: 'title1234', version: 1 });
+    await ticket.save();
+
+    const response = await request(app)
+      .post(URL)
+      .set('Cookie', global.signin())
+      .send({
+        ticketId: ticket._id
+      })
+      .expect(201);
+
+    expect(response.body.userId).toBeDefined();
+    expect(response.body.expiresAt).toBeDefined();
+    expect(response.body.status).toEqual(OrderStatus.Created);
+    expect(response.body.ticket.title).toEqual('title1234');
+    expect(response.body.ticket.price).toEqual(200);
+    expect(response.body.ticket.version).toEqual(1);
+  });
+
   it('has a route handler listening to /api/orders for post requests', async () => {
     const response = await request(app).post(URL).send({});
     expect(response.status).not.toEqual(404);
@@ -61,42 +82,20 @@ describe('new', () => {
       .expect(400);
   });
 
-  it('reserves the ticket', async () => {
-    const ticket = Ticket.build({ price: 10, title: 'title123', version: 1 });
+  it('publishes an event', async () => {
+    const ticket = Ticket.build({
+      price: 10,
+      title: 'check if even is emitted',
+      version: 1
+    });
     await ticket.save();
-
-    const response = await request(app)
+    await request(app)
       .post(URL)
       .set('Cookie', global.signin())
       .send({
         ticketId: ticket._id
       })
       .expect(201);
-
-    expect(response.body.userId).toBeDefined();
-    expect(response.body.expiresAt).toBeDefined();
-    expect(response.body.status).toEqual(OrderStatus.Created);
-    expect(response.body.ticket.title).toEqual('title123');
-    expect(response.body.ticket.price).toEqual(10);
-    expect(response.body.ticket.version).toEqual(1);
+    expect(natsWrapper.client.publish).toHaveBeenCalled();
   });
-
-  it.todo('publishes an event');
-
-  // , async () => {
-  // const ticket = Ticket.build({
-  //   price: 10,
-  //   title: 'check if even is emitted',
-  //   version: 1
-  // });
-  // await ticket.save();
-  // await request(app)
-  //   .post(URL)
-  //   .set('Cookie', global.signin())
-  //   .send({
-  //     ticketId: ticket._id
-  //   })
-  //   .expect(201);
-  // expect(natsWrapper.client.publish).toHaveBeenCalled();
-  // });
 });
