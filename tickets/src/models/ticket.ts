@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface ITicket {
@@ -6,18 +6,18 @@ interface ITicket {
   price: number;
   userId: Types.ObjectId;
 }
-interface ITicketDoc extends Document {
+interface ITicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: Types.ObjectId;
   version: number;
 }
 
-interface ITicketModel extends Model<ITicketDoc> {
+interface ITicketModel extends mongoose.Model<ITicketDoc> {
   build(ticket: ITicket): HydratedDocument<ITicketDoc>;
 }
 
-const ticketSchema = new Schema<ITicketDoc>(
+const ticketSchema = new mongoose.Schema<ITicketDoc>(
   {
     title: {
       type: String,
@@ -28,7 +28,7 @@ const ticketSchema = new Schema<ITicketDoc>(
       required: true
     },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       require: true
     }
@@ -47,4 +47,7 @@ const ticketSchema = new Schema<ITicketDoc>(
 ticketSchema.plugin(updateIfCurrentPlugin);
 ticketSchema.statics.build = (ticket: ITicket) => new Ticket(ticket);
 
-export const Ticket = model<ITicketDoc, ITicketModel>('Ticket', ticketSchema);
+export const Ticket = mongoose.model<ITicketDoc, ITicketModel>(
+  'Ticket',
+  ticketSchema
+);

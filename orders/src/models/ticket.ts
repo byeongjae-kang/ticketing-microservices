@@ -1,5 +1,5 @@
 import { OrderStatus } from '@bk0719/common';
-import mongoose, { Schema, Types, model } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { Order } from './order';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
@@ -69,4 +69,7 @@ ticketSchema.methods.isReserved = async function () {
   return !!existingOrder;
 };
 
-export const Ticket = model<ITicketDoc, ITicketModel>('Ticket', ticketSchema);
+export const Ticket = mongoose.model<ITicketDoc, ITicketModel>(
+  'Ticket',
+  ticketSchema
+);

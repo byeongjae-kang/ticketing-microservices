@@ -1,10 +1,4 @@
-import mongoose, {
-  HydratedDocument,
-  Model,
-  Schema,
-  Types,
-  model
-} from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { OrderStatus } from '@bk0719/common';
 import { ITicketDoc } from './ticket';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
@@ -32,19 +26,19 @@ interface IOrderDoc extends mongoose.Document {
   version: number;
 }
 
-interface IOrderModel extends Model<IOrderDoc> {
+interface IOrderModel extends mongoose.Model<IOrderDoc> {
   build(order: IOrder): HydratedDocument<IOrderDoc>;
 }
 
-const orderSchema = new Schema(
+const orderSchema = new mongoose.Schema(
   {
     ticket: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'Ticket',
       require: true
     },
     userId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       require: true
     },
@@ -55,7 +49,7 @@ const orderSchema = new Schema(
       default: OrderStatus.Created
     },
     expiresAt: {
-      type: Schema.Types.Date
+      type: mongoose.Schema.Types.Date
     }
   },
   {
@@ -73,4 +67,7 @@ const orderSchema = new Schema(
 orderSchema.plugin(updateIfCurrentPlugin);
 orderSchema.statics.build = (order: IOrder) => new Order(order);
 
-export const Order = model<IOrderDoc, IOrderModel>('Order', orderSchema);
+export const Order = mongoose.model<IOrderDoc, IOrderModel>(
+  'Order',
+  orderSchema
+);
