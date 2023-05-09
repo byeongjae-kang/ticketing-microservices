@@ -11,6 +11,7 @@ interface ITicketDoc extends mongoose.Document {
   price: number;
   userId: Types.ObjectId;
   version: number;
+  orderId?: Types.ObjectId;
 }
 
 interface ITicketModel extends mongoose.Model<ITicketDoc> {
@@ -31,6 +32,10 @@ const ticketSchema = new mongoose.Schema<ITicketDoc>(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       require: true
+    },
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order'
     }
   },
   {
