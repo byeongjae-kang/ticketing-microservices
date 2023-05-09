@@ -16,11 +16,7 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
       title
     });
 
-    try {
-      await ticket.save();
-      message.ack();
-    } catch (err) {
-      console.log('Could not save it into db');
-    }
+    await ticket.save();
+    message.ack();
   }
 }
