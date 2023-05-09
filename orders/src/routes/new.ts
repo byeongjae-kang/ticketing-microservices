@@ -10,6 +10,8 @@ import { body } from 'express-validator';
 import { Types } from 'mongoose';
 import { Ticket } from '../models/ticket';
 import { Order } from '../models/order';
+import { OrderCreatedPublisher } from '../events/order-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const EXPIRATION_WINDOW_SECONDS = 15 * 50;
 
@@ -48,11 +50,16 @@ router.post(
 
     await order.save();
 
-    // await new orderCreatedPublisher(natsWrapper.client).publish({
-    //   id: order.id,
-    //   title: order.title,
-    //   price: order.price
-    // });
+    new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      status: order.status,
+      expiresAt: order.expiresAt.toISOString(),
+      userId: new Types.ObjectId(req.currentUser!.id),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price
+      }
+    });
 
     res.status(201).send(order);
   }

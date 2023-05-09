@@ -1,5 +1,5 @@
 import { OrderStatus } from '@bk0719/common';
-import { Date, HydratedDocument, Model, Schema, model } from 'mongoose';
+import { Date, HydratedDocument, Model, Schema, Types, model } from 'mongoose';
 import { Order } from './order';
 
 interface ITicket {
@@ -8,6 +8,7 @@ interface ITicket {
   version: number;
 }
 export interface ITicketDoc extends Document {
+  _id: Types.ObjectId;
   title: string;
   price: number;
   version: number;

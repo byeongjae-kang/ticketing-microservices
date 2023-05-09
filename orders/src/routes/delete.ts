@@ -6,6 +6,8 @@ import {
 } from '@bk0719/common';
 import { Request, Response, Router } from 'express';
 import { Order } from '../models/order';
+import { OrderCancelledPublisher } from '../events/order-cancelled-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
 const router = Router();
 
@@ -13,7 +15,7 @@ router.patch(
   '/api/orders/:id',
   requireAuth,
   async (req: Request, res: Response) => {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate('ticket');
 
     if (!order) {
       throw new NotFoundError();
@@ -26,7 +28,12 @@ router.patch(
     order.set({ status: OrderStatus.Cancelled });
     await order.save();
 
-    // await new orderUpdatedPublisher(natsWrapper.client).publish({});
+    new OrderCancelledPublisher(natsWrapper.client).publish({
+      id: order.id,
+      ticket: {
+        id: order.ticket._id
+      }
+    });
 
     res.status(201).send(order);
   }
