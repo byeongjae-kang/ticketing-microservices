@@ -13,21 +13,16 @@ export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
   queueGroupName = queueGroupName;
 
   async onMessage(data: TicketUpdatedEvent['data'], message: Message) {
-    const { id, price, title } = data;
-
-    const ticket = await Ticket.findById(id);
+    const ticket = await Ticket.findByEvent(data);
 
     if (!ticket) {
       throw new NotFoundError();
     }
 
-    ticket.set({ price, title });
+    const { title, price } = data;
+    ticket.set({ title, price });
+    await ticket.save();
 
-    try {
-      await ticket.save();
-      message.ack();
-    } catch (err) {
-      console.log('Could not save it into db');
-    }
+    message.ack();
   }
 }

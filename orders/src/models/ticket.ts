@@ -1,28 +1,29 @@
 import { OrderStatus } from '@bk0719/common';
-import { Date, HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import mongoose, { Schema, Types, model } from 'mongoose';
 import { Order } from './order';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface ITicket {
   id: Types.ObjectId;
   title: string;
   price: number;
-  version: number;
 }
-export interface ITicketDoc extends Document {
-  _id: Types.ObjectId;
+export interface ITicketDoc extends mongoose.Document {
   title: string;
   price: number;
   version: number;
-  createdAt?: Date;
-  updatedAt?: Date;
   isReserved(): boolean;
 }
 
-interface ITicketModel extends Model<ITicketDoc> {
-  build(ticket: ITicket): HydratedDocument<ITicketDoc>;
+interface ITicketModel extends mongoose.Model<ITicketDoc> {
+  build(ticket: ITicket): ITicketDoc;
+  findByEvent(event: {
+    id: Types.ObjectId;
+    version: number;
+  }): Promise<ITicketDoc | null>;
 }
 
-const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
+const ticketSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -31,14 +32,10 @@ const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
     price: {
       type: Number,
       required: true
-    },
-    version: {
-      type: Number,
-      required: true
     }
   },
   {
-    timestamps: true,
+    versionKey: 'version',
     toJSON: {
       transform: (doc, ret) => {
         ret.id = ret._id;
@@ -49,6 +46,9 @@ const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
   }
 );
 
+ticketSchema.plugin(updateIfCurrentPlugin);
+ticketSchema.statics.findByEvent = async ({ id, version }) =>
+  Ticket.findOne({ _id: id, version: version - 1 });
 ticketSchema.statics.build = (ticket: ITicket) =>
   new Ticket({
     ...ticket,

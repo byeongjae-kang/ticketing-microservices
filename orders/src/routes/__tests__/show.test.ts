@@ -32,7 +32,7 @@ describe('show', () => {
     const ticket = Ticket.build({
       title: 'concert',
       price: 12,
-      version: 1
+      id: new Types.ObjectId()
     });
     await ticket.save();
     const user = global.signin();
@@ -68,7 +68,7 @@ describe('show', () => {
     const ticket = Ticket.build({
       title: 'concert',
       price: 12,
-      version: 1
+      id: new Types.ObjectId()
     });
     await ticket.save();
     const user = global.signin();

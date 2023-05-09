@@ -13,8 +13,7 @@ export class TicketCreatedListener extends Listener<TicketCreatedEvent> {
     const ticket = Ticket.build({
       id,
       price,
-      title,
-      version: message.getSequence()
+      title
     });
 
     try {

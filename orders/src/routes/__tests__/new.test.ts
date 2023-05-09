@@ -9,7 +9,11 @@ export const URL = '/api/orders';
 
 describe('new', () => {
   it('reserves the ticket', async () => {
-    const ticket = Ticket.build({ price: 200, title: 'title1234', version: 1 });
+    const ticket = Ticket.build({
+      price: 200,
+      title: 'title1234',
+      id: new Types.ObjectId()
+    });
     await ticket.save();
 
     const response = await request(app)
@@ -25,7 +29,7 @@ describe('new', () => {
     expect(response.body.status).toEqual(OrderStatus.Created);
     expect(response.body.ticket.title).toEqual('title1234');
     expect(response.body.ticket.price).toEqual(200);
-    expect(response.body.ticket.version).toEqual(1);
+    expect(response.body.ticket.version).toEqual(0);
   });
 
   it('has a route handler listening to /api/orders for post requests', async () => {
@@ -62,7 +66,11 @@ describe('new', () => {
   });
 
   it('returns an error if the ticket is already reserved', async () => {
-    const ticket = Ticket.build({ price: 10, title: 'ticket', version: 1 });
+    const ticket = Ticket.build({
+      price: 10,
+      title: 'ticket',
+      id: new Types.ObjectId()
+    });
     await ticket.save();
 
     const res = await request(app)
@@ -86,7 +94,7 @@ describe('new', () => {
     const ticket = Ticket.build({
       price: 10,
       title: 'check if even is emitted',
-      version: 1
+      id: new Types.ObjectId()
     });
     await ticket.save();
     await request(app)

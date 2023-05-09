@@ -55,6 +55,7 @@ router.post(
       status: order.status,
       expiresAt: order.expiresAt.toISOString(),
       userId: new Types.ObjectId(req.currentUser!.id),
+      version: order.version,
       ticket: {
         id: ticket.id,
         price: ticket.price

@@ -8,18 +8,15 @@ describe('orders', () => {
     const tickets = await Ticket.insertMany([
       {
         price: 10,
-        title: 'title',
-        version: 1
+        title: 'title'
       },
       {
         price: 20,
-        title: 'title2',
-        version: 1
+        title: 'title2'
       },
       {
         price: 20,
-        title: 'title3',
-        version: 1
+        title: 'title3'
       }
     ]);
     const cookie1 = global.signin();
