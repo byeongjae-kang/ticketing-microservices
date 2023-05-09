@@ -1,4 +1,5 @@
-import { Date, HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import { HydratedDocument, Model, Schema, Types, model } from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
 
 interface ITicket {
   title: string;
@@ -9,15 +10,14 @@ interface ITicketDoc extends Document {
   title: string;
   price: number;
   userId: Types.ObjectId;
-  createdAt?: Date;
-  updatedAt?: Date;
+  version: number;
 }
 
 interface ITicketModel extends Model<ITicketDoc> {
   build(ticket: ITicket): HydratedDocument<ITicketDoc>;
 }
 
-const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
+const ticketSchema = new Schema<ITicketDoc>(
   {
     title: {
       type: String,
@@ -34,17 +34,17 @@ const ticketSchema = new Schema<ITicketDoc, ITicketModel>(
     }
   },
   {
-    timestamps: true,
+    versionKey: 'version',
     toJSON: {
       transform: (doc, ret) => {
         ret.id = ret._id;
         delete ret._id;
-        delete ret.__v;
       }
     }
   }
 );
 
+ticketSchema.plugin(updateIfCurrentPlugin);
 ticketSchema.statics.build = (ticket: ITicket) => new Ticket(ticket);
 
 export const Ticket = model<ITicketDoc, ITicketModel>('Ticket', ticketSchema);
