@@ -4,6 +4,8 @@ import { Types } from 'mongoose';
 import { Order } from '../../models/order';
 import { OrderStatus } from '@bk0719/common';
 import { stripe } from '../../stripe';
+import { Payment } from '../../models/payment';
+import { natsWrapper } from '../../nats-wrapper';
 
 const URL = '/api/payments';
 jest.mock('../../stripe.ts');
@@ -73,7 +75,6 @@ it('returns a 201 with valid inputs and calls charge function', async () => {
   });
 
   await order.save();
-
   await request(app)
     .post(URL)
     .set('Cookie', global.signin(userId))
@@ -82,6 +83,12 @@ it('returns a 201 with valid inputs and calls charge function', async () => {
       token: 'tok_visa'
     })
     .expect(201);
+  const payment = await Payment.findOne({
+    orderId: order.id,
+    stripeId: 'mock_id'
+  });
 
+  expect(payment).toBeDefined();
   expect(stripe.charges.create).toHaveBeenCalled();
+  expect(natsWrapper.client.publish).toHaveBeenCalled();
 });
