@@ -3,6 +3,7 @@ import 'express-async-errors';
 import cookieSession from 'cookie-session';
 
 import { NotFoundError, currentUser, errorHandler } from '@bk0719/common';
+import { createPaymentRouter } from './routes/new';
 
 export const app = express();
 
@@ -16,6 +17,7 @@ app.use(
 );
 
 app.use(currentUser);
+app.use(createPaymentRouter);
 
 app.all('*', () => {
   throw new NotFoundError();

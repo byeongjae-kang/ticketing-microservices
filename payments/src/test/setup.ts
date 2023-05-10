@@ -26,12 +26,12 @@ afterAll(async () => {
 });
 
 declare global {
-  var signin: () => string[];
+  var signin: (id?: Types.ObjectId) => string[];
 }
 
-global.signin = () => {
+global.signin = (id = new Types.ObjectId()) => {
   const payload = {
-    id: new Types.ObjectId(),
+    id,
     email: 'test@test.com'
   };
 
