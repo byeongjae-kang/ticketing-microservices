@@ -20,6 +20,10 @@ export class ExpirationCompletedListener extends Listener<ExpirationCompletedEve
       throw new NotFoundError();
     }
 
+    if (order.status === OrderStatus.completed) {
+      return message.ack();
+    }
+
     order.set({ status: OrderStatus.Cancelled });
     await order.save();
 
