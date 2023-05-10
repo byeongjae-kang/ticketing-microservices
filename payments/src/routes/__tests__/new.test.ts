@@ -3,8 +3,11 @@ import { app } from '../../app';
 import { Types } from 'mongoose';
 import { Order } from '../../models/order';
 import { OrderStatus } from '@bk0719/common';
+import { stripe } from '../../stripe';
 
 const URL = '/api/payments';
+jest.mock('../../stripe.ts');
+
 it('returns 404 when purchasing order that does not exist', async () => {
   await request(app)
     .post(URL)
@@ -56,4 +59,29 @@ it('returns a 400 when purchasing an cancelled order', async () => {
       token: 'token'
     })
     .expect(400);
+});
+
+it('returns a 201 with valid inputs and calls charge function', async () => {
+  const userId = new Types.ObjectId();
+
+  const order = Order.build({
+    id: new Types.ObjectId(),
+    price: 0.01,
+    status: OrderStatus.Created,
+    userId,
+    version: 0
+  });
+
+  await order.save();
+
+  await request(app)
+    .post(URL)
+    .set('Cookie', global.signin(userId))
+    .send({
+      orderId: order.id,
+      token: 'tok_visa'
+    })
+    .expect(201);
+
+  expect(stripe.charges.create).toHaveBeenCalled();
 });
