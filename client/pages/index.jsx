@@ -2,8 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 
 const Index = ({ tickets }) => {
-  console.log(tickets);
-
   const ticketList = tickets.map((ticket) => (
     <tr key={ticket.id}>
       <td>{ticket.title}</td>
