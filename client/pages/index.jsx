@@ -1,7 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import Router from 'next/router';
 
-const Index = ({ tickets }) => {
+const Index = ({ tickets, currentUser }) => {
+  if (!currentUser) {
+    return <div>You are not signed in.</div>;
+  }
+
   const ticketList = tickets.map((ticket) => (
     <tr key={ticket.id}>
       <td>{ticket.title}</td>
