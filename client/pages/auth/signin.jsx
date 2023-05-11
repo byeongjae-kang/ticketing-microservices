@@ -24,7 +24,7 @@ const Signin = () => {
   return (
     <form onSubmit={submitHandler}>
       <h1>Sign In</h1>
-      <div className="form-group">
+      <div className="mb-3">
         <label>Email Address</label>
         <input
           value={email}
@@ -32,7 +32,7 @@ const Signin = () => {
           className="form-control"
         />
       </div>
-      <div className="form-group">
+      <div className="mb-3">
         <label>Password</label>
         <input
           value={password}

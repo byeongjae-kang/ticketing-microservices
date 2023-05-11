@@ -1,16 +1,42 @@
 import React from 'react';
-// import buildClient from '../api/build-client';
+import Link from 'next/link';
 
-const Index = ({ currentUser }) => {
-  return <h1>You are {currentUser ? '' : 'not '}signed in</h1>;
+const Index = ({ tickets }) => {
+  console.log(tickets);
+
+  const ticketList = tickets.map((ticket) => (
+    <tr key={ticket.id}>
+      <td>{ticket.title}</td>
+      <td>${ticket.price.toFixed(2)}</td>
+      <td>
+        <Link href="/tickets/[ticketId]" as={`/tickets/${ticket.id}`}>
+          View
+        </Link>
+      </td>
+    </tr>
+  ));
+
+  return (
+    <div>
+      <h1>Tickets</h1>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Price</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>{ticketList}</tbody>
+      </table>
+    </div>
+  );
 };
 
 Index.getInitialProps = async (context, client, currentUser) => {
-  // const client = buildClient(context);
-  // const { data } = await client.get('/api/users/currentuser');
+  const { data } = await client.get('/api/tickets');
 
-  // return data;
-  return {};
+  return { tickets: data };
 };
 
 export default Index;
