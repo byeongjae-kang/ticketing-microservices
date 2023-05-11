@@ -20,7 +20,7 @@ const setup = async () => {
     title: 'new testing listener',
     price: ticket.price,
     version: ticket.version + 1,
-    useId: new Types.ObjectId()
+    userId: new Types.ObjectId()
   };
 
   const msg = { ack: jest.fn() } as unknown as Message;
